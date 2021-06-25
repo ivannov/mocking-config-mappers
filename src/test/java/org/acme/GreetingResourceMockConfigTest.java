@@ -5,6 +5,8 @@ import io.quarkus.test.junit.mockito.InjectMock;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
@@ -24,4 +26,23 @@ public class GreetingResourceMockConfigTest {
                 .body(is("Hello RESTEasy! My name is Joe"));
     }
 
+    @Test
+    public void testHello() {
+        Mockito.when(appConfig.showName()).thenReturn(false);
+        given()
+                .when().get("/hello-resteasy")
+                .then()
+                .statusCode(200)
+                .body(is("Hello RESTEasy!"));
+    }
+
+
+    @ApplicationScoped
+    @io.quarkus.test.Mock
+    public static class MockedAppConfig implements AppConfig {
+        @Override
+        public boolean showName() {
+            throw new IllegalStateException();
+        }
+    }
 }
